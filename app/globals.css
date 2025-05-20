@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+/* myFonts---------------------------------------------------- */
+/* FMBoylar - primary Font */
+@font-face {
+  src: url("/fonts/FMBolyarSansPro-100.ttf") format('truetype');
+  font-family:FMBoylar ;
+  font-weight: 100;
+  font-style: normal;
+}
+@font-face {
+  src: url("/fonts/FMBolyarSansPro-200.ttf") format('truetype');
+  font-family:FMBoylar ;
+  font-weight: 200;
+}
+@font-face {
+  src: url("/fonts/FMBolyarSansPro-300.ttf") format('truetype');
+  font-family:FMBoylar ;
+  font-weight: 300;
+}
+@font-face {
+  src: url("/fonts/FMBolyarSansPro-500.ttf") format('truetype');
+  font-family:FMBoylar ;
+  font-weight: 500;
+}
+
+/* Gilory-SecondaryFont */
+@font-face {
+ src: url("/fonts/Gilroy-Light.otf") ;
+  font-family:Gilory ;
+  font-weight: 300;
+}
+@font-face {
+ src: url("/fonts/Gilroy-ExtraBold.otf") ;
+  font-family:Gilory ;
+  font-weight: 800;
+}
+
+
+@theme inline {
+  /* color -----------------*/
+  --color-foreground:#001c54;
+  --color-background:#fefffe;
+
+  /* myFonts ----------------*/
+  --font-FMBoylar : FMBoylar, sans-pro;
+  --font-Gilroy: Gilory,sans-serif
+}
+
+
+
+body {
+  color: var(--color-foreground);
+  background: var(--color-background);
+  font-family: FMBoylar, Arial, Helvetica, sans-serif;
+}
+
+
+
+
+
+
+
+/* :root {
+  --background: #fefffe;
+  --foreground: #001c54;
+} */
+
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
