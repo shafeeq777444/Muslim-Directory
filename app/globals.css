@@ -1,5 +1,13 @@
 @import "tailwindcss";
-
+/* 
+:root {
+  --color-foreground-100: #ebf4ff;
+  --color-foreground-200: #cce1ff;
+  --color-foreground-300: #1a50a8;
+  --color-foreground-400: #008ff9;
+  --color-foreground-500: #003a96;
+  --color-foreground-600: #001C54;
+} */
 /* myFonts---------------------------------------------------- */
 /* FMBoylar - primary Font */
 @font-face {
@@ -31,9 +39,67 @@
   font-weight: 300;
 }
 @font-face {
+ src: url("/fonts/Gilroy-LightItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 300;
+    font-style: italic;
+}
+@font-face {
+ src: url("/fonts/Gilroy-Medium.ttf") ;
+  font-family:Gilory ;
+  font-weight: 400;
+}
+@font-face {
+ src: url("/fonts/Gilroy-MediumItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+ src: url("/fonts/Gilroy-Regular.ttf") ;
+  font-family:Gilory ;
+  font-weight: 500;
+}
+@font-face {
+ src: url("/fonts/Gilroy-RegularItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 500;
+  font-style: italic;
+}
+@font-face {
+ src: url("/fonts/Gilroy-SemiBold.ttf") ;
+  font-family:Gilory ;
+  font-weight: 600;
+
+}
+@font-face {
+ src: url("/fonts/Gilroy-SemiBoldItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 600;
+  font-style: italic;
+}
+@font-face {
+ src: url("/fonts/Gilroy-Bold.ttf") ;
+  font-family:Gilory ;
+  font-weight: 700;
+
+}
+@font-face {
+ src: url("/fonts/Gilroy-BoldItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 700;
+  font-style: italic;
+}
+@font-face {
  src: url("/fonts/Gilroy-ExtraBold.otf") ;
   font-family:Gilory ;
   font-weight: 800;
+}
+@font-face {
+ src: url("/fonts/Gilroy-ExtraBoldItalic.ttf") ;
+  font-family:Gilory ;
+  font-weight: 800;
+  font-style: italic;
 }
 
 
@@ -41,6 +107,12 @@
   /* color -----------------*/
   --color-foreground:#001c54;
   --color-background:#fefffe;
+  --color-foregroundLight:#ebf4ff;
+  --color-foregroundMedium:#cce1ff;
+  --color-foregroundRegular:#1a50a8;
+  --color-foregroundSemiBold:#008ff9;
+  --color-foregroundBold:#1a50a8;
+  --color-foregroundExtra:#001C54;
 
   /* myFonts ----------------*/
   --font-FMBoylar : FMBoylar, sans-pro;
@@ -52,7 +124,7 @@
 body {
   color: var(--color-foreground);
   background: var(--color-background);
-  font-family: FMBoylar, Arial, Helvetica, sans-serif;
+  font-family: Gilory, Arial, Helvetica, sans-serif;
 }
 
 
