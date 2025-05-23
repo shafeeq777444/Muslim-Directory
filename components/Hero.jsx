@@ -8,16 +8,16 @@ const Hero = () => {
   const opacityText = useTransform(scrollY, [0, 300], [1, 0.2]);
 
   return (
-    <div className="relative w-full h-[100dvh] overflow-hidden">
+    <div className="relative w-full h-[100dvh] overflow-hidden ">
       {/* Background Image */}
-      <img
-        src="/hero/hero9.jpg"
-        alt="Hero Background"
-        className="fixed -z-20 top-0 left-0 w-full h-full object-cover"
-      />
+      
 
       {/* Dark Overlay */}
-      <div className="absolute top-0 left-0 w-full h-full bg-black/50 z-[-10]" />
+      <div className=" top-0 left-0 w-full h-full bg-black/50 z-[-10]" ><img
+        src="/hero/hero10.jpg"
+        alt="Hero Background"
+        className="fixed -z-20 top-0 left-0 w-full h-full object-cover"
+      /></div>
 
       {/* Hero Content */}
       <motion.div

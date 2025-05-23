@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import About from "@/components/About";
 import AnimatedOnScroll from "@/components/AnimatedScrollerOnWrapper";
 import ContactSection from "@/components/ContactUs";
@@ -26,13 +26,13 @@ export default function Home() {
                     <HowItWorks />
                 </AnimatedOnScroll>
                 <div ref={mainFormRef}>
-          <AnimatedOnScroll>
-            <MainForm />
-          </AnimatedOnScroll>
-        </div>
+                    <AnimatedOnScroll>
+                        <MainForm />
+                    </AnimatedOnScroll>
+                </div>
                 <FAQSection />
                 <ContactSection />
-                <MainButton scrollToRef={mainFormRef}/>
+                <MainButton scrollToRef={mainFormRef} />
             </div>
         </>
     );

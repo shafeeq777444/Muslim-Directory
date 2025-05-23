@@ -87,7 +87,7 @@ export default function BenefitsSection() {
                     Key Benefits That Empower the Global Muslim Community
                 </motion.h2>
                 {/* Benefits grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:h-[80vh]">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-8 md:h-[80vh]">
                     {benefits.map((benefit, index) => {
                         const ref = useRef(null);
                         const isInView = useInView(ref, {
@@ -122,7 +122,7 @@ export default function BenefitsSection() {
                                     stiffness: 90,
                                     damping: 18
                                 }}
-                                className="flex flex-col items-center text-center md:items-start md:text-left cursor-pointer"
+                                className="flex flex-col items-start  text-justify md:items-start md:text-left cursor-pointer"
                                 onMouseEnter={() => setHoveredIndex(index)}
                                 onMouseLeave={() => setHoveredIndex(null)}
                             >
