@@ -5,7 +5,7 @@ import ContactSection from "@/components/ContactUs";
 import FAQSection from "@/components/Faq";
 
 import BenefitsSection from "@/components/Feature";
-import BusinessOwnerForm from "@/components/form/BuisnessForm";
+import BusinessOwnerForm from "@/components/form/BuisnessForm/BuisnessForm";
 import MainForm from "@/components/form/MainForm";
 import MuslimDirectoryForm from "@/components/form/SkillPerson";
 
@@ -13,6 +13,7 @@ import Hero from "@/components/Hero";
 import MainButton from "@/components/MainButton";
 import HowItWorks from "@/components/WorkFlow";
 import { useRef } from "react";
+import { Toaster } from "react-hot-toast";
 
 export default function Home() {
     const mainFormRef = useRef(null);
@@ -33,6 +34,7 @@ export default function Home() {
                 <FAQSection />
                 <ContactSection />
                 <MainButton scrollToRef={mainFormRef} />
+                <Toaster reverseOrder={false} />
             </div>
         </>
     );

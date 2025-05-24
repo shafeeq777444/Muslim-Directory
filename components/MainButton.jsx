@@ -22,7 +22,7 @@ export default function HoverLogoButton({ scrollToRef }) {
 
   return (
     <motion.button
-      className="bg-foreground scale-75 fixed bottom-10 right-10 text-white rounded-full font-medium flex items-center overflow-hidden hover:bg-foregroundExtra transition-colors duration-300 shadow-lg"
+      className="bg-foreground z-100 cursor-pointer scale-75 fixed bottom-10 right-10 text-white rounded-full font-medium flex items-center overflow-hidden hover:bg-foregroundExtra transition-colors duration-300 shadow-lg"
       onHoverStart={() => !isMobile && setIsHovered(true)}
       onHoverEnd={() => !isMobile && setIsHovered(false)}
       onClick={handleClick}

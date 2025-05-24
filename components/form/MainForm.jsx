@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import MuslimDirectoryForm from './SkillPerson'
-import BusinessOwnerForm from './BuisnessForm'
+import BusinessOwnerForm from './BuisnessForm/BuisnessForm'
 
 const MainForm = () => {
     const [form,setForm]=useState("buisnessOwner")
