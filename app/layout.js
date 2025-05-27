@@ -1,11 +1,13 @@
-
+"use client"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
-export const metadata = {
-  title: "Muslim Directory",
-  description: "Discover and support Muslim businesses, professionals, and job seekers. Build a stronger Muslim community through trust, trade, and collaboration.",
-};
-
+// export const metadata = {
+//   title: "Muslim Directory",
+//   description: "Discover and support Muslim businesses, professionals, and job seekers. Build a stronger Muslim community through trust, trade, and collaboration.",
+// };
+const queryClient=new QueryClient()
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
@@ -33,7 +35,10 @@ export default function RootLayout({ children }) {
       <body
         className={`antialiased`}
       >
+        <QueryClientProvider client={queryClient}>
+          <Toaster reverseOrder={false} />
         {children}
+        </QueryClientProvider>
       </body>
     </html>
   );

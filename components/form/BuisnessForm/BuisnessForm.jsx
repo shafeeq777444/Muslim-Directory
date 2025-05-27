@@ -1,10 +1,12 @@
-"use client";
+'use client'
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useAddBuisnessDetail } from "@/features/hooks/useBuisness";
 
 export default function BusinessOwnerForm({ setForm }) {
-  const defaultFormData={
+    const { mutate, isSuccess, isPending, isError } = useAddBuisnessDetail();
+    const defaultFormData = {
         businessName: "",
         businessCategory: "",
         businessDescription: "",
@@ -19,19 +21,20 @@ export default function BusinessOwnerForm({ setForm }) {
         contactNumber: "",
         email: "",
         website: "",
-    }
+    };
     const [currentStep, setCurrentStep] = useState(1);
+    const [isClient, setIsClient] = useState(false);
     const [errors, setErrors] = useState({});
     const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
-    const [formData, setFormData] = useState(()=>{
-         if (typeof window !== "undefined") {
-             const saved = localStorage.getItem("businessOwnerForm");
-             if(saved){
+    const [formData, setFormData] = useState(() => {
+        if (typeof window !== "undefined") {
+            const saved = localStorage.getItem("businessOwnerForm");
+            if (saved) {
                 const parsed = JSON.parse(saved);
                 return { ...defaultFormData, ...parsed };
-             }
-              return defaultFormData;
-         }
+            }
+            return defaultFormData;
+        }
     });
 
     const businessCategories = [
@@ -115,11 +118,6 @@ export default function BusinessOwnerForm({ setForm }) {
         }
         if (!formData.postalCode) {
             newErrors.postalCode = "Postal/ZIP code is required";
-        } else if (
-            !/^\d{5}(-\d{4})?$/.test(formData.postalCode) &&
-            !/^[A-Za-z]\d[A-Za-z][ -]?\d[A-Za-z]\d$/.test(formData.postalCode)
-        ) {
-            newErrors.postalCode = "Enter a valid postal/ZIP code";
         }
 
         setErrors(newErrors);
@@ -147,6 +145,7 @@ export default function BusinessOwnerForm({ setForm }) {
     };
     // Load data from localStorage on component mount
     useEffect(() => {
+        setIsClient(true);
         const savedData = localStorage.getItem("businessOwnerForm");
         if (savedData) {
             const parsedData = JSON.parse(savedData);
@@ -215,33 +214,43 @@ export default function BusinessOwnerForm({ setForm }) {
         }
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         let validate = true;
         if (currentStep == 4) {
             validate = validateStep4();
         }
         if (validate) {
             console.log("Business Owner Form submitted:", formData);
-            localStorage.removeItem("businessOwnerForm");
-            localStorage.removeItem("businessOwnerStep");
-            toast.success("Business registration completed successfully!");
-            setShowCategoryDropdown(false);
-            setCurrentStep(1);
-            setFormData({
-                businessName: "",
-                businessCategory: "",
-                businessDescription: "",
-                firstName: "",
-                lastName: "",
-                position: "",
-                streetAddress: "",
-                streetAddress2: "",
-                city: "",
-                state: "",
-                postalCode: "",
-                contactNumber: "",
-                email: "",
-                website: "",
+            mutate(formData, {
+                onSuccess: (data) => {
+                    toast.success(data.message);
+                    if (isClient) {
+                        localStorage.removeItem("businessOwnerForm");
+                        localStorage.removeItem("businessOwnerStep");
+                    }
+                    setShowCategoryDropdown(false);
+                    setCurrentStep(1);
+                    setFormData({
+                        businessName: "",
+                        businessCategory: "",
+                        businessDescription: "",
+                        firstName: "",
+                        lastName: "",
+                        position: "",
+                        streetAddress: "",
+                        streetAddress2: "",
+                        city: "",
+                        state: "",
+                        postalCode: "",
+                        contactNumber: "",
+                        email: "",
+                        website: "",
+                    });
+                },
+                onError: (error) => {
+                    console.error("onError triggered:", error);
+                    toast.error("Something went wrong.");
+                },
             });
         }
     };
@@ -262,7 +271,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="businessName"
                                     placeholder="Business Name *"
-                                    value={formData?.businessName}
+                                    value={formData?.businessName || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -277,7 +286,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="businessCategory"
                                     placeholder="Business Category *"
-                                    value={formData.businessCategory}
+                                    value={formData?.businessCategory || ""}
                                     onChange={handleInputChange}
                                     onFocus={() => setShowCategoryDropdown(true)}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
@@ -310,7 +319,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                 <textarea
                                     name="businessDescription"
                                     placeholder="Business Description *"
-                                    value={formData.businessDescription}
+                                    value={formData?.businessDescription ||""}
                                     onChange={handleInputChange}
                                     rows="4"
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none"
@@ -339,7 +348,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                         type="text"
                                         name="firstName"
                                         placeholder="First Name *"
-                                        value={formData.firstName}
+                                        value={formData?.firstName || ""}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                         required
@@ -353,7 +362,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                         type="text"
                                         name="lastName"
                                         placeholder="Last Name *"
-                                        value={formData.lastName}
+                                        value={formData?.lastName || ""}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                         required
@@ -369,7 +378,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="position"
                                     placeholder="Position in the Business *"
-                                    value={formData.position}
+                                    value={formData?.position || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -395,7 +404,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="streetAddress"
                                     placeholder="Street Address *"
-                                    value={formData.streetAddress}
+                                    value={formData?.streetAddress || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -410,7 +419,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="streetAddress2"
                                     placeholder="Street Address Line 2"
-                                    value={formData.streetAddress2}
+                                    value={formData?.streetAddress2 || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                 />
@@ -422,7 +431,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                         type="text"
                                         name="city"
                                         placeholder="City *"
-                                        value={formData.city}
+                                        value={formData?.city || ""}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                         required
@@ -434,7 +443,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                         type="text"
                                         name="state"
                                         placeholder="State / Province *"
-                                        value={formData.state}
+                                        value={formData?.state || ""}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                         required
@@ -448,7 +457,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="text"
                                     name="postalCode"
                                     placeholder="Postal / Zip Code *"
-                                    value={formData.postalCode}
+                                    value={formData?.postalCode || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -475,7 +484,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="tel"
                                     name="contactNumber"
                                     placeholder="Contact Number *"
-                                    value={formData.contactNumber}
+                                    value={formData?.contactNumber || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -491,7 +500,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="email"
                                     name="email"
                                     placeholder="E-mail *"
-                                    value={formData.email}
+                                    value={formData?.email || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                     required
@@ -504,7 +513,7 @@ export default function BusinessOwnerForm({ setForm }) {
                                     type="url"
                                     name="website"
                                     placeholder="Website"
-                                    value={formData.website}
+                                    value={formData?.website || ""}
                                     onChange={handleInputChange}
                                     className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
                                 />

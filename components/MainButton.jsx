@@ -1,4 +1,4 @@
-"use client";
+
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -22,7 +22,7 @@ export default function HoverLogoButton({ scrollToRef }) {
 
   return (
     <motion.button
-      className="bg-foreground z-100 cursor-pointer scale-75 fixed bottom-10 right-10 text-white rounded-full font-medium flex items-center overflow-hidden hover:bg-foregroundExtra transition-colors duration-300 shadow-lg"
+      className={`bg-foreground z-100 ${isMobile?'right-4 bottom-4':"right-10 bottom-10"} cursor-pointer scale-75 fixed   text-white rounded-full font-medium flex items-center overflow-hidden hover:bg-foregroundExtra transition-colors duration-300 shadow-lg`}
       onHoverStart={() => !isMobile && setIsHovered(true)}
       onHoverEnd={() => !isMobile && setIsHovered(false)}
       onClick={handleClick}
@@ -37,14 +37,14 @@ export default function HoverLogoButton({ scrollToRef }) {
       aria-label="Get in touch"
     >
       <motion.div
-        className="w-10 h-10 flex items-center justify-center"
+        className="w-6 h-10 flex items-center justify-center"
         animate={{ scale: isHovered ? 1.1 : 1 }}
         transition={{ duration: 0.3 }}
       >
         <img
           src="/logos/whiteLogo.svg"
           alt="Logo"
-          className="w-8 h-8 object-contain"
+          className="w-10 h-10 object-contain"
         />
       </motion.div>
       <motion.div

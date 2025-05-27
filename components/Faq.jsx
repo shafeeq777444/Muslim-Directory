@@ -1,10 +1,3 @@
-"use client";
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronUp } from "lucide-react";
-const smoothEase = [0.25, 0.46, 0.45, 0.94];
-const gentleEase = [0.23, 1, 0.32, 1];
-
 const faqs = [
     {
         question: "Can I promote offers or run ads through this platform?",
@@ -54,57 +47,11 @@ Whether you're a small shop owner or a seasoned professional, being part of this
     },
 ];
 
-const FAQItem = ({ faq, isOpen, onClick }) => (
-    <div className="border-b border-gray-200 ">
-        <button
-            className="flex justify-between w-full py-4 text-left text-lg font-medium text-gray-800 focus:outline-none"
-            onClick={onClick}
-        >
-            {faq.question}
-            {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-        </button>
-        <AnimatePresence initial={false}>
-            {isOpen && (
-                <motion.div
-                    key="content"
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{
-                        duration: 1.2,
-                        ease: smoothEase,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 15,
-                    }}
-                    className="overflow-hidden text-gray-600  whitespace-pre-wrap"
-                >
-                    {faq.answer}
-                </motion.div>
-            )}
-        </AnimatePresence>
-    </div>
-);
+import React from "react";
+import FAQSection from "./FaqSection";
 
-const FAQSection = () => {
-    const [openIndex, setOpenIndex] = useState(null);
-
-    const toggleFAQ = (index) => {
-        setOpenIndex(openIndex === index ? null : index);
-    };
-
-    return (
-        <div className="w-full bg-background">
-            <section className="max-w-3xl bg-background mx-auto px-4 py-16 ">
-                <h2 className="text-3xl font-bold text-center mb-10">Frequently Asked Questions</h2>
-                <div className="space-y-4 grid grid-cols-1 ">
-                    {faqs.map((faq, index) => (
-                        <FAQItem key={index} faq={faq} isOpen={openIndex === index} onClick={() => toggleFAQ(index)} />
-                    ))}
-                </div>
-            </section>
-        </div>
-    );
+const Faq = () => {
+    return <FAQSection faqs={faqs} />;
 };
 
-export default FAQSection;
+export default Faq;

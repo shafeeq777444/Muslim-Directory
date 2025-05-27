@@ -1,49 +1,64 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useAddSkilledPeople } from "@/features/hooks/useSkilledPeople";
 
 export default function MuslimDirectoryForm({ setForm }) {
-    const defaultFormData={
+    const defaultFormData = {
         fullName: "",
         email: "",
         contactNumber: "",
         skills: "",
         experience: "",
         resume: null,
-    }
+    };
+
+    const { mutate } = useAddSkilledPeople();
     const [currentStep, setCurrentStep] = useState(1);
     const [errors, setErrors] = useState({});
-    const [formData, setFormData] = useState(()=>{
-         if (typeof window !== "undefined") {
-             const saved = localStorage.getItem("skilledPersonForm");
-             if(saved){
-                const parsed = JSON.parse(saved);
-                return { ...defaultFormData, ...parsed };
-             }
-              return defaultFormData;
-         }
-    });
-     useEffect(() => {
-            const savedData = localStorage.getItem("skilledPersonForm");
-            const savedStep = localStorage.getItem("skilledPersonCurrentStep");
-            if (savedData) {
-            setFormData(JSON.parse(savedData));
+    const [formData, setFormData] = useState(defaultFormData);
+    const [isClient, setIsClient] = useState(false);
+
+    // Safe client-side initialization
+    useEffect(() => {
+        setIsClient(true);
+        
+        // Only run on client-side after hydration
+        const savedData = localStorage.getItem("skilledPersonForm");
+        const savedStep = localStorage.getItem("skilledPersonCurrentStep");
+        
+        if (savedData) {
+            try {
+                const parsed = JSON.parse(savedData);
+                setFormData(prevData => ({ ...defaultFormData, ...parsed }));
+            } catch (error) {
+                console.error("Error parsing saved form data:", error);
+                localStorage.removeItem("skilledPersonForm");
+            }
         }
+        
         if (savedStep) {
-            setCurrentStep(parseInt(savedStep));
+            const stepNumber = parseInt(savedStep);
+            if (stepNumber >= 1 && stepNumber <= 4) {
+                setCurrentStep(stepNumber);
+            }
         }
-        }, []);
-    
-        // Save data to localStorage whenever formData changes
-        useEffect(() => {
+    }, []);
+
+    // Save data to localStorage whenever formData changes (client-side only)
+    useEffect(() => {
+        if (isClient) {
             localStorage.setItem("skilledPersonForm", JSON.stringify(formData));
-        }, [formData]);
-    
-        // Save current step to localStorage
-        useEffect(() => {
+        }
+    }, [formData, isClient]);
+
+    // Save current step to localStorage (client-side only)
+    useEffect(() => {
+        if (isClient) {
             localStorage.setItem("skilledPersonCurrentStep", currentStep.toString());
-        }, [currentStep]);
+        }
+    }, [currentStep, isClient]);
+
     const validateStep1 = () => {
         const newErrors = {};
 
@@ -60,7 +75,7 @@ export default function MuslimDirectoryForm({ setForm }) {
             newErrors.email = "Enter a valid email address";
         }
 
-        // Phone: required and must be 10 digits (customize as needed)
+        // Phone: required and must be valid format
         const phoneRegex = /^\+?[1-9]\d{1,14}$/;
         if (!formData.contactNumber) {
             newErrors.contactNumber = "Phone number is required";
@@ -76,48 +91,23 @@ export default function MuslimDirectoryForm({ setForm }) {
         const newErrors = {};
 
         if (!formData.skills || formData.skills.trim().length < 2) {
-            newErrors.skills = "Skills must be at Added";
+            newErrors.skills = "Skills must be added";
         }
 
         setErrors(newErrors);
-        console.log(newErrors);
         return Object.keys(newErrors).length === 0;
     };
+
     const validateStep4 = () => {
         const newErrors = {};
 
         if (!formData.resume) {
-            newErrors.resume = "Resume must be at Added";
+            newErrors.resume = "Resume must be uploaded";
         }
 
         setErrors(newErrors);
-        console.log(newErrors);
         return Object.keys(newErrors).length === 0;
     };
-    // Load data from localStorage on component mount
-    // useEffect(() => {
-    //     const savedData = localStorage.getItem("muslimDirectoryForm");
-    //     if (savedData) {
-    //         const parsedData = JSON.parse(savedData);
-    //         setFormData(parsedData);
-
-    //         // Get saved step
-    //         const savedStep = localStorage.getItem("muslimDirectoryStep");
-    //         if (savedStep) {
-    //             setCurrentStep(parseInt(savedStep));
-    //         }
-    //     }
-    // }, []);
-
-    // Save data to localStorage whenever formData changes
-    // useEffect(() => {
-    //     localStorage.setItem("muslimDirectoryForm", JSON.stringify(formData));
-    // }, [formData]);
-
-    // Save current step to localStorage
-    // useEffect(() => {
-    //     localStorage.setItem("muslimDirectoryStep", currentStep.toString());
-    // }, [currentStep]);
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -125,30 +115,62 @@ export default function MuslimDirectoryForm({ setForm }) {
             ...prev,
             [name]: value,
         }));
+        
+        // Clear specific error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: undefined
+            }));
+        }
     };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            // Validate file type
+            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+            if (!allowedTypes.includes(file.type)) {
+                toast.error("Please upload a PDF, DOC, or DOCX file");
+                return;
+            }
+            
+            // Validate file size (e.g., 5MB limit)
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error("File size must be less than 5MB");
+                return;
+            }
+            
             setFormData((prev) => ({
                 ...prev,
                 resume: file,
             }));
+            
+            // Clear resume error
+            if (errors.resume) {
+                setErrors(prev => ({
+                    ...prev,
+                    resume: undefined
+                }));
+            }
         }
     };
 
     const nextStep = () => {
         if (currentStep < 4) {
-            let validate = true;
-            validate = validateStep1();
-            if (currentStep == 2) {
-                validate = validateStep2();
+            let isValid = false;
+            
+            if (currentStep === 1) {
+                isValid = validateStep1();
+            } else if (currentStep === 2) {
+                isValid = validateStep2();
+            } else if (currentStep === 3) {
+                isValid = true; // Experience is optional
             }
-            if (currentStep == 4) {
-                validate = validateStep4();
-            }
-            if (validate) {
+            
+            if (isValid) {
                 setCurrentStep(currentStep + 1);
+                setErrors({}); // Clear errors when moving to next step
             }
         }
     };
@@ -156,21 +178,53 @@ export default function MuslimDirectoryForm({ setForm }) {
     const prevStep = () => {
         if (currentStep > 1) {
             setCurrentStep(currentStep - 1);
+            setErrors({}); // Clear errors when going back
         }
     };
 
-    const handleSubmit = () => {
-        let validate = true;
-        validate = validateStep1() && validateStep2() && validateStep4();
-        if(!validate){
-          toast.error("Please complete all required fields")
-          return;
+    const handleSubmit = async () => {
+        // Validate all required steps
+        const step1Valid = validateStep1();
+        const step2Valid = validateStep2();
+        const step4Valid = validateStep4();
+        
+        if (!step1Valid || !step2Valid || !step4Valid) {
+            toast.error("Please complete all required fields");
+            return;
         }
-        console.log("Form submitted:", formData);
-        // Clear localStorage after successful submission
-        localStorage.removeItem("muslimDirectoryForm");
-        localStorage.removeItem("muslimDirectoryStep");
-        toast.success("Registration completed successfully!");
+
+        try {
+            const form = new FormData();
+            Object.entries(formData).forEach(([key, value]) => {
+                if (value !== null && value !== undefined) {
+                    form.append(key, value);
+                }
+            });
+
+            mutate(form, {
+                onSuccess: (data) => {
+                    toast.success(data.message);
+                    
+                    // Clear localStorage after successful submission
+                    if (isClient) {
+                        localStorage.removeItem("skilledPersonForm");
+                        localStorage.removeItem("skilledPersonCurrentStep");
+                    }
+                    
+                    // Reset form
+                    setFormData(defaultFormData);
+                    setCurrentStep(1);
+                    setErrors({});
+                },
+                onError: (error) => {
+                    console.error("Submission error:", error);
+                    toast.error("Failed to submit form. Please try again.");
+                }
+            });
+        } catch (error) {
+            console.error("Form submission error:", error);
+            toast.error("An unexpected error occurred");
+        }
     };
 
     const renderStep = () => {
@@ -191,10 +245,12 @@ export default function MuslimDirectoryForm({ setForm }) {
                                     placeholder="Full Name *"
                                     value={formData.fullName}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                                    className={`w-full px-4 py-3 bg-blue-800 border rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all ${
+                                        errors?.fullName ? 'border-red-500' : 'border-blue-600'
+                                    }`}
                                     required
                                 />
-                                {errors?.fullName && <p className="text-xs pl-1 pt-1 text-red-800">{errors.fullName}</p>}
+                                {errors?.fullName && <p className="text-xs pl-1 pt-1 text-red-400">{errors.fullName}</p>}
                             </div>
 
                             <div>
@@ -204,10 +260,12 @@ export default function MuslimDirectoryForm({ setForm }) {
                                     placeholder="Email Address *"
                                     value={formData.email}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                                    className={`w-full px-4 py-3 bg-blue-800 border rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all ${
+                                        errors?.email ? 'border-red-500' : 'border-blue-600'
+                                    }`}
                                     required
                                 />
-                                {errors?.email && <p className="text-xs pl-1 pt-1 text-red-800">{errors.email}</p>}
+                                {errors?.email && <p className="text-xs pl-1 pt-1 text-red-400">{errors.email}</p>}
                             </div>
 
                             <div>
@@ -217,11 +275,13 @@ export default function MuslimDirectoryForm({ setForm }) {
                                     placeholder="Contact Number *"
                                     value={formData.contactNumber}
                                     onChange={handleInputChange}
-                                    className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
+                                    className={`w-full px-4 py-3 bg-blue-800 border rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all ${
+                                        errors?.contactNumber ? 'border-red-500' : 'border-blue-600'
+                                    }`}
                                     required
                                 />
                                 {errors?.contactNumber && (
-                                    <p className="text-xs pl-1 pt-1 text-red-800">{errors.contactNumber}</p>
+                                    <p className="text-xs pl-1 pt-1 text-red-400">{errors.contactNumber}</p>
                                 )}
                             </div>
                         </div>
@@ -243,9 +303,11 @@ export default function MuslimDirectoryForm({ setForm }) {
                                 value={formData.skills}
                                 onChange={handleInputChange}
                                 rows="6"
-                                className="w-full px-4 py-3 bg-blue-800 border border-blue-600 rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none"
+                                className={`w-full px-4 py-3 bg-blue-800 border rounded-lg text-white placeholder-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all resize-none ${
+                                    errors?.skills ? 'border-red-500' : 'border-blue-600'
+                                }`}
                             />
-                            {errors?.skills && <p className="text-xs pl-1 pt-1 text-red-800">{errors.skills}</p>}
+                            {errors?.skills && <p className="text-xs pl-1 pt-1 text-red-400">{errors.skills}</p>}
                         </div>
                     </div>
                 );
@@ -255,7 +317,7 @@ export default function MuslimDirectoryForm({ setForm }) {
                     <div className="space-y-6">
                         <div className="text-center mb-8">
                             <h2 className="text-2xl font-semibold text-white mb-2">Experience</h2>
-                            <p className="text-blue-200">Share your professional experience</p>
+                            <p className="text-blue-200">Share your professional experience (Optional)</p>
                         </div>
 
                         <div>
@@ -280,7 +342,9 @@ export default function MuslimDirectoryForm({ setForm }) {
                         </div>
 
                         <div>
-                            <div className="border-2 border-dashed border-blue-600 rounded-lg p-8 text-center hover:border-blue-400 transition-all">
+                            <div className={`border-2 border-dashed rounded-lg p-8 text-center hover:border-blue-400 transition-all ${
+                                errors?.resume ? 'border-red-500' : 'border-blue-600'
+                            }`}>
                                 <input
                                     type="file"
                                     accept=".pdf,.doc,.docx"
@@ -305,7 +369,7 @@ export default function MuslimDirectoryForm({ setForm }) {
                                         </svg>
                                     </div>
                                     <p className="text-white font-medium">Click to upload resume</p>
-                                    <p className="text-blue-300 text-sm mt-1">PDF, DOC, or DOCX files only</p>
+                                    <p className="text-blue-300 text-sm mt-1">PDF, DOC, or DOCX files only (Max 5MB)</p>
                                 </label>
                                 {formData.resume && (
                                     <div className="mt-4 p-3 bg-blue-800 rounded-lg">
@@ -313,7 +377,7 @@ export default function MuslimDirectoryForm({ setForm }) {
                                     </div>
                                 )}
                             </div>
-                            {errors?.resume && <p className="text-xs pl-1 pt-1 text-red-800">{errors.resume}</p>}
+                            {errors?.resume && <p className="text-xs pl-1 pt-1 text-red-400">{errors.resume}</p>}
                         </div>
 
                         <div className="bg-blue-800 rounded-lg p-6 border border-blue-600">
@@ -331,13 +395,13 @@ export default function MuslimDirectoryForm({ setForm }) {
                                 {formData.skills && (
                                     <p className="text-blue-200">
                                         <span className="text-white font-medium">Skills:</span>{" "}
-                                        {formData.skills.substring(0, 100)}...
+                                        {formData.skills.length > 100 ? `${formData.skills.substring(0, 100)}...` : formData.skills}
                                     </p>
                                 )}
                                 {formData.experience && (
                                     <p className="text-blue-200">
                                         <span className="text-white font-medium">Experience:</span>{" "}
-                                        {formData.experience.substring(0, 100)}...
+                                        {formData.experience.length > 100 ? `${formData.experience.substring(0, 100)}...` : formData.experience}
                                     </p>
                                 )}
                             </div>
@@ -435,7 +499,6 @@ export default function MuslimDirectoryForm({ setForm }) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut", delay: 0.2 }}
                     className="bg-slate-800 flex-1 rounded-2xl w-full max-w-2xl p-4 md:p-8 shadow-2xl border border-slate-700"
-                    // onClick={() => setShowCategoryDropdown(false)}
                 >
                     <div>
                         {renderStep()}
@@ -494,8 +557,6 @@ export default function MuslimDirectoryForm({ setForm }) {
                         </div>
                     </div>
                 </motion.div>
-
-                {/* Optional Badge */}
             </div>
         </div>
     );
