@@ -28,16 +28,9 @@ const ContactSection = () => {
 
   const socialIcons = [
     { icon: Instagram, href: '#', label: 'Instagram' },
-    { icon: Phone, href: 'tel:07716534984', label: 'Phone' },
-    { 
-      icon: () => (
-        <svg viewBox="0 0 24 24" className="w-6 h-6 fill-current">
-          <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-2.08v2.44a4.83 4.83 0 01-3.77 4.25 4.83 4.83 0 01-3.77-4.25V2H4.12v.44a4.83 4.83 0 01-3.77 4.25v1.75a4.83 4.83 0 013.77 4.25V2.44h2.08v9.81a4.83 4.83 0 013.77-4.25V6.25a4.83 4.83 0 013.77 4.25v1.75z"/>
-        </svg>
-      ),
-      href: '#',
-      label: 'TikTok'
-    }
+    // { icon: Phone, href: 'tel:07716534984', label: 'Phone' },
+    {icon:Mail,href:"mailto:salaam@themuslimdirectory.ca",label:'Mail'}
+
   ];
 
   return (
@@ -99,8 +92,10 @@ Reach out to connect, grow, and strengthen our shared values — together, we bu
                   <Mail className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Email</h3>
-                  <p className="text-gray-300">hello@refit.com</p>
+                  <a href="mailto:salaam@themuslimdirectory.ca">
+                    <h3 className="text-xl font-semibold mb-2">Email</h3>
+                    <p className="text-gray-300">salaam@themuslimdirectory.ca</p>
+                  </a>
                 </div>
               </motion.div>
 
