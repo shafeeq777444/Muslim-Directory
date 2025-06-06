@@ -99,7 +99,7 @@ Reach out to connect, grow, and strengthen our shared values — together, we bu
                 </div>
               </motion.div>
 
-              <motion.div 
+              {/* <motion.div 
                 className="flex items-start space-x-4 group cursor-pointer"
                 whileHover={{ x: 10 }}
                 transition={{ type: "spring", stiffness: 300 }}
@@ -111,7 +111,7 @@ Reach out to connect, grow, and strengthen our shared values — together, we bu
                   <h3 className="text-xl font-semibold mb-2">Telephone</h3>
                   <p className="text-gray-300">07716 534984</p>
                 </div>
-              </motion.div>
+              </motion.div> */}
             </motion.div>
 
             {/* Social Media */}
